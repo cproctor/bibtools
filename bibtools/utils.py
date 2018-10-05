@@ -8,8 +8,14 @@ def entries_to_csv(entries, filename):
 def entries_to_df(entries):
     "Converts an iterable of pybtex.database.Entry to a pandas.DataFrame"
     df = pd.DataFrame.from_dict(entry_to_dict(e) for e in entries)
-    df = df.assign(url=df.apply(lambda row: row['url'] or row['URL'], axis=1))
-    df = df.drop(columns=['URL']) # Merging column URL into url
+    df = clean_df(df)
+    return df
+
+def clean_df(df):
+    "Cleans up some common cruft"
+    if "URL" in df.columns: # Merging column URL into url
+        df = df.assign(url=df.apply(lambda row: row['url'] or row['URL'], axis=1))
+        df = df.drop(columns=['URL'])
     return df
 
 def persons_to_dict(persons, n=3, formatter=None):
